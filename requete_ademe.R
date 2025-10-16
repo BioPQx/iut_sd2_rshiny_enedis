@@ -1,48 +1,100 @@
-install.packages(c("httr", "jsonlite"))
+install.packages(c("httr", "jsonlite", "dplyr", "purrr"))
 
 library(httr)
 library(jsonlite)
+library(dplyr)
+library(purrr)
 
-base_url <- "https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines"
-
-final_df <- data.frame()
-page <- 1
-
-repeat {
-  params <- list(
-    page = page,
-    size = 5,
-    select = paste(
-      "nom_commune_ban",
-      "etiquette_ges",
-      "code_departement_ban",
-      "annee_construction",
-      "besoin_chauffage",
-      "type_batiment",
-      "type_installation_chauffage",
-      "date_etablissement_dpe",
-      "code_postal_ban",
-      "surface_habitable_logement",
-      "hauteur_sous_plafond",
-      "etiquette_dpe",
-      sep = ","
-    ),
-    qs = 'code_departement_ban : "01" OR code_departement_ban : "30"'
+maj_dpe <- function(df_dpe = NULL,
+                    departements = c("01", "30"),
+                    base_url = "https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines",
+                    limit = 1000) {
+  
+  message("⏳ Récupération des données depuis l'API ADEME (filtrage avec `qs`)...")
+  
+  colonnes <- c(
+    "numero_dpe",
+    "nom_commune_ban",
+    "etiquette_ges",
+    "code_departement_ban",
+    "annee_construction",
+    "besoin_chauffage",
+    "type_batiment",
+    "type_installation_chauffage",
+    "date_etablissement_dpe",
+    "code_postal_ban",
+    "surface_habitable_logement",
+    "hauteur_sous_plafond",
+    "etiquette_dpe"
   )
   
-  url_encoded <- modify_url(base_url, query = params)
-  response <- GET(url_encoded)
-  stop_for_status(response)
+  get_dep_data <- function(dep_code) {
+    message(paste0("📦 Département ", dep_code))
+    all_data <- list()
+    offset <- 0
+    total <- Inf
+    
+    repeat {
+      res <- GET(
+        url = base_url,
+        query = list(
+          qs = paste0("code_departement_ban:", dep_code),
+          size = limit,
+          from = offset
+        ),
+        timeout(30)
+      )
+      
+      if (res$status_code != 200) {
+        warning(paste0("⚠️ Erreur API pour le département ", dep_code, " (code ", res$status_code, ")"))
+        break
+      }
+      
+      json_data <- content(res, as = "text", encoding = "UTF-8")
+      parsed <- fromJSON(json_data, flatten = TRUE)
+      
+      if (length(parsed$results) == 0) break
+      if (!is.null(parsed$total)) total <- parsed$total
+      
+      df_part <- parsed$results %>%
+        select(any_of(colonnes))
+      
+      all_data[[length(all_data) + 1]] <- df_part
+      
+      offset <- offset + limit
+      message(paste0("  ➕ ", nrow(df_part), " lignes chargées (offset ", offset, "/", total, ")"))
+      
+      if (offset >= total) break
+    }
+    
+    df_dep <- bind_rows(all_data)
+    message(paste0("✅ Département ", dep_code, ": ", nrow(df_dep), " lignes téléchargées."))
+    return(df_dep)
+  }
   
-  content <- fromJSON(rawToChar(response$content), flatten = TRUE)
-  df <- content$results
+  new_data <- map_dfr(departements, get_dep_data)
+  message(paste0("📥 Données totales téléchargées : ", nrow(new_data), " lignes."))
   
-  final_df <- rbind(final_df, df)
+  if (is.null(df_dpe)) {
+    message("📄 Aucun dataframe existant : création du dataframe initial.")
+    df_final <- new_data
+  } else {
+    message("🔍 Vérification des DPE manquants...")
+    nouveaux <- setdiff(new_data$numero_dpe, df_dpe$numero_dpe)
+    message(paste0("🆕 ", length(nouveaux), " nouveaux DPE à ajouter."))
+    if (length(nouveaux) > 0) {
+      df_ajout <- new_data %>% filter(numero_dpe %in% nouveaux)
+      df_final <- bind_rows(df_dpe, df_ajout)
+    } else {
+      message("✅ Aucun nouveau DPE à ajouter.")
+      df_final <- df_dpe
+    }
+  }
   
-  if (nrow(df) < 5) break
-  page <- page + 1
-  Sys.sleep(0.2)  # sécurité pour éviter de spammer l'API
+  message(paste0("📊 Taille finale du dataframe : ", nrow(df_final), " lignes."))
+  return(df_final)
 }
 
-dim(final_df)
-View(final_df)
+#df_dpe <- maj_dpe() - Pour lancer la requete initiale.
+
+# df_dpe <- maj_dpe(df_dpe) - Met à jour le dataframe existant en ajoutant les nouveaux DPE
