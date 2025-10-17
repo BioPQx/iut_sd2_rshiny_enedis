@@ -1,4 +1,15 @@
 library(shiny)
+library(bslib)
+
+light_theme <- bs_theme(
+  version = 5,
+  bg = "#FFFFFF", fg = "#000000", primary = "#2C3E50"
+)
+
+dark_theme <- bs_theme(
+  version = 5,
+  bg = "#2C3E50", fg = "#FFFFFF", primary = "#E74C3C"
+)
 
 fluidPage(
   
@@ -52,7 +63,12 @@ fluidPage(
   ),
   
   div(class="title-box",
-      "Projet RShiny"
+      "Projet RShiny",
+      tags$a(href="https://github.com/BioPQx/iut_sd2_rshiny_enedis",
+      tags$img(src="https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/img_github.png", alt="github projet", width = "45px", height = "45px")),
+      theme = light_theme,
+      selectInput("theme_choice", "Choisissez un thème:", c("Clair", "Sombre")),
+      textOutput("txt"),
   ),
   
   fluidRow(
