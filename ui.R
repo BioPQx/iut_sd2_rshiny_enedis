@@ -1,4 +1,9 @@
 library(shiny)
+library(plotly)
+library(readr)
+library(dplyr)
+library(vroom)
+library(rlang)
 library(bslib)
 
 light_theme <- bs_theme(
@@ -99,14 +104,31 @@ ui <- fluidPage(
       width = 3,
       div(class="sidebar-panel",
           div(class="section-title","VARIABLES"),
-          selectInput("variables", "Variable des places (en ratio):", choices = c("VAR_AN_MOY")),
-          selectInput("trou", "Variable des trous (en volume):", choices = c("HOP 2015")),
-          div(class="section-title","FONDS"),
-          selectInput("fonds", "Modifier l'ordre des fonds:", choices = c("analyse", "maille", "contour")),
-          sliderInput("opacity", "Opacité du layering affiché", min = 0, max = 100, value = 25),
-          checkboxInput("show_points", "Afficher les ronds sur la carte", TRUE),
-          checkboxInput("show_legende", "Afficher la légende"),
-          checkboxInput("show_donnees", "Afficher les brutes")
+          fluidRow(
+            column(6, selectInput("var_x", "Axe X :", choices = NULL)),
+            column(6, selectInput("var_y", "Axe Y :", choices = NULL))
+          ),
+          numericInput(
+            inputId = "max_points",
+            label = "Nombre maximum de points à afficher",
+            value = 100,  # valeur par défaut
+            min = 10,
+            max = 10000,
+            step = 100
+          ),
+          div(
+            style = "display: flex; align-items: center;",
+            textInput(
+              inputId = "filter_condition",
+              label = "Filtrer les données :",
+              value = ""
+            ),
+            tags$span(
+              icon("info-circle"),  # icône info (de font-awesome)
+              title = "Exemple : Sepal.Length > 5 & Species == 'setosa'",
+              style = "margin-left: 5px; cursor: pointer;"
+            )
+          )
       )
     ),
     column(
@@ -118,7 +140,9 @@ ui <- fluidPage(
                          "Zone de visualisation de la carte ici..."),
                      div(class="circle-legend", "Légende graphique ici")
             ),
-            tabPanel("Données", p("Affichage des données")),
+            tabPanel("Données", 
+                     plotlyOutput("graph_plot", height = "500px")
+            ),
             tabPanel("Maille", p("Affichage de la maille")),
             tabPanel("Contour", p("Affichage des contours"))
           )
