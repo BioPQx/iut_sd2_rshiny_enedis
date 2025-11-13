@@ -6,15 +6,25 @@ library(bslib)
 initial_theme <- bs_theme(version = 5, bg = "white", fg = "black")
 
 ui <- fluidPage(
-  theme = initial_theme,  # thème initial pour permettre le changement dynamique
+  theme = initial_theme,
   
   tags$head(
     tags$style(HTML("
+      html, body, .container-fluid {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
       body { color: var(--bs-body-color); }
+
+      /* --- Bandeau du haut --- */
       .title-box {
         background-color: var(--bs-secondary);
         color: var(--bs-body-fg);
-        height: 60px;
+        height: 8%;
+        min-height: 60px;
         font-size: 28px;
         padding-left: 20px;
         line-height: 60px;
@@ -23,33 +33,72 @@ ui <- fluidPage(
         align-items: center;
         justify-content: space-between;
       }
+
       .title-actions { display: flex; align-items: center; gap: 18px; }
+
+      .menu-button {
+        background: none;
+        border: none;
+        font-size: 28px;
+        color: var(--bs-body-fg);
+        cursor: pointer;
+        margin-right: 10px;
+      }
+
+      /* --- Zone principale (100 % hauteur restante) --- */
+      .main-layout {
+        display: flex;
+        flex-direction: row;
+        height: 92%;
+        width: 100%;
+        transition: all 0.3s ease;
+      }
+
       .sidebar-panel {
         background-color: var(--bs-secondary);
         color: var(--bs-body-fg);
-        min-height: 90vh;
+        min-width: 300px;
+        height: 100%;
         border-top-right-radius: 15px;
         padding: 18px;
         box-shadow: 2px 0 8px #24354f80;
+        transition: all 0.3s ease;
       }
+
+      .sidebar-hidden {
+        width: 0 !important;
+        min-width: 0 !important;
+        padding: 0 !important;
+        opacity: 0;
+        overflow: hidden;
+        box-shadow: none;
+      }
+
       .main-content {
+        flex: 1;
         background-color: var(--bs-body-bg);
         color: var(--bs-body-color);
-        min-height: 90vh;
         border-radius: 10px;
-        margin-left: 10px;
         overflow: auto;
         padding: 20px;
+        margin: 10px;
+        height: calc(100% - 20px);
+        transition: all 0.3s ease;
       }
+
       .section-title { color: var(--bs-fg); font-size: 15px; margin-bottom: 8px; font-weight: bold; letter-spacing: 1px; }
       .circle-legend { background: var(--bs-secondary); color: var(--bs-body-bg); border-radius: 7px; padding: 10px; margin-top: 16px; }
     "))
   ),
   
-  # --- Bandeau titre et selecteur de thème ---
+  # --- Bandeau titre ---
   div(
     class="title-box",
-    span("Projet RShiny"),
+    div(
+      style="display:flex; align-items:center; gap:10px;",
+      tags$button(id="menu_toggle", class="menu-button", icon("bars")),
+      span("Projet RShiny")
+    ),
     div(
       class="title-actions",
       tags$a(
@@ -71,61 +120,70 @@ ui <- fluidPage(
     )
   ),
   
-  # --- Contenu principal ---
-  fluidRow(
-    column(
-      width = 3,
+  # --- Contenu principal dynamique ---
+  div(
+    class = "main-layout",
+    
+    # Sidebar
+    div(
+      id = "sidebar_panel",
+      class = "sidebar-panel",
+      div(class="section-title", "VARIABLES"),
+      fluidRow(
+        column(6, selectInput("var_x", "Axe X :", choices = NULL)),
+        column(6, selectInput("var_y", "Axe Y :", choices = NULL))
+      ),
+      numericInput(
+        inputId = "max_points",
+        label = "Nombre maximum de points à afficher",
+        value = 100,
+        min = 10,
+        max = 10000,
+        step = 100
+      ),
       div(
-        class="sidebar-panel",
-        div(class="section-title", "VARIABLES"),
-        fluidRow(
-          column(6, selectInput("var_x", "Axe X :", choices = NULL)),
-          column(6, selectInput("var_y", "Axe Y :", choices = NULL))
+        style = "display: flex; align-items: center;",
+        textInput(
+          inputId = "filter_condition",
+          label = "Filtrer les données :",
+          value = ""
         ),
-        numericInput(
-          inputId = "max_points",
-          label = "Nombre maximum de points à afficher",
-          value = 100,
-          min = 10,
-          max = 10000,
-          step = 100
-        ),
-        div(
-          style = "display: flex; align-items: center;",
-          textInput(
-            inputId = "filter_condition",
-            label = "Filtrer les données :",
-            value = ""
-          ),
-          tags$span(
-            icon("info-circle"),
-            title = "Exemple : Sepal.Length > 5 & Species == 'setosa'",
-            style = "margin-left: 5px; cursor: pointer;"
-          )
+        tags$span(
+          icon("info-circle"),
+          title = "Exemple : Sepal.Length > 5 & Species == 'setosa'",
+          style = "margin-left: 5px; cursor: pointer;"
         )
       )
     ),
-    column(
-      width = 9,
-      div(
-        class="main-content",
-        tabsetPanel(
-          tabPanel(
-            "Carte",
-            div(
-              style="height:500px; background:var(--bs-body-bg); border-radius:8px; margin-bottom:12px; color:var(--bs-body-color);",
-              "Zone de visualisation de la carte ici..."
-            ),
-            div(class="circle-legend", "Légende graphique ici")
+    
+    # Contenu principal
+    div(
+      id = "main_content",
+      class = "main-content",
+      tabsetPanel(
+        tabPanel(
+          "Carte",
+          div(
+            style="height:80%; background:var(--bs-body-bg); border-radius:8px; margin-bottom:12px; color:var(--bs-body-color); display:flex; align-items:center; justify-content:center;",
+            "Zone de visualisation de la carte ici..."
           ),
-          tabPanel(
-            "Données",
-            plotlyOutput("graph_plot", height="500px")
-          ),
-          tabPanel("Maille", p("Affichage de la maille")),
-          tabPanel("Contour", p("Affichage des contours"))
-        )
+          div(class="circle-legend", "Légende graphique ici")
+        ),
+        tabPanel(
+          "Données",
+          plotlyOutput("graph_plot", height="80%")
+        ),
+        tabPanel("Maille", p("Affichage de la maille")),
+        tabPanel("Contour", p("Affichage des contours"))
       )
     )
-  )
+  ),
+  
+  # --- Script JS pour basculer la sidebar ---
+  tags$script(HTML("
+    $(document).on('click', '#menu_toggle', function() {
+      $('#sidebar_panel').toggleClass('sidebar-hidden');
+    });
+  "))
 )
+
