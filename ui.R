@@ -1,6 +1,8 @@
 library(shiny)
 library(plotly)
 library(bslib)
+library(shinymanager)
+
 
 # --- Thème initial obligatoire pour Bootstrap 5 ---
 initial_theme <- bs_theme(version = 5, bg = "white", fg = "black")
@@ -9,6 +11,7 @@ ui <- fluidPage(
   theme = initial_theme,
   
   tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "style.css"),
     tags$style(HTML("
       html, body, .container-fluid {
         height: 100%;
@@ -17,7 +20,10 @@ ui <- fluidPage(
         padding: 0;
       }
 
-      body { color: var(--bs-body-color); }
+      body { 
+        color: var(--bs-body-color);
+        overflow: hidden;
+      }
 
       /* --- Bandeau du haut --- */
       .title-box {
@@ -45,7 +51,7 @@ ui <- fluidPage(
         margin-right: 10px;
       }
 
-      /* --- Zone principale (100 % hauteur restante) --- */
+      /* --- Zone principale --- */
       .main-layout {
         display: flex;
         flex-direction: row;
@@ -54,26 +60,27 @@ ui <- fluidPage(
         transition: all 0.3s ease;
       }
 
+      /* --- Sidebar fixe en pixels --- */
       .sidebar-panel {
         background-color: var(--bs-secondary);
         color: var(--bs-body-fg);
-        min-width: 300px;
+        width: 280px;
+        min-width: 280px;
         height: 100%;
         border-top-right-radius: 15px;
         padding: 18px;
         box-shadow: 2px 0 8px #24354f80;
         transition: all 0.3s ease;
+        flex-shrink: 0;
       }
 
       .sidebar-hidden {
-        width: 0 !important;
-        min-width: 0 !important;
-        padding: 0 !important;
+        margin-left: -280px;
         opacity: 0;
-        overflow: hidden;
-        box-shadow: none;
+        transition: all 0.3s ease;
       }
 
+      /* --- Zone principale flexible --- */
       .main-content {
         flex: 1;
         background-color: var(--bs-body-bg);
@@ -128,6 +135,7 @@ ui <- fluidPage(
     div(
       id = "sidebar_panel",
       class = "sidebar-panel",
+      style = "width: clamp(150px, 30%, 450px);",
       div(class="section-title", "VARIABLES"),
       fluidRow(
         column(6, selectInput("var_x", "Axe X :", choices = NULL)),
@@ -187,3 +195,4 @@ ui <- fluidPage(
   "))
 )
 
+ui <- shinymanager::secure_app(ui, language = "fr")
