@@ -4,6 +4,14 @@ library(dplyr)
 library(rlang)
 library(bslib)
 library(ggplot2)
+library(shinymanager)
+
+credentials <- data.frame(
+  user = c("utilisateur1", "admin"),
+  password = c("motdepasse1", "adminpass"),
+  stringsAsFactors = FALSE
+)
+
 
 # --- Charger le CSV globalement ---
 url <- "https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/df_dpe.csv"
@@ -34,8 +42,9 @@ themes <- list(
 # --- Fonction serveur ---
 function(input, output, session) {
   
-  # --- Appliquer un thème initial ---
-  session$setCurrentTheme(themes[["dark"]])
+  res_auth <- shinymanager::secure_server(
+    check_credentials = check_credentials(credentials)
+  )
   
   # --- Changement dynamique de thème ---
   observe({
