@@ -7,8 +7,8 @@ library(ggplot2)
 library(shinymanager)
 
 credentials <- data.frame(
-  user = c("utilisateur1", "admin"),
-  password = c("motdepasse1", "adminpass"),
+  user = c("utilisateur1", "admin", "utilisateur2", "asardell"),
+  password = c("motdepasse1", "adminpass", "motdepasse2", "licorne"),
   stringsAsFactors = FALSE
 )
 
@@ -45,6 +45,10 @@ function(input, output, session) {
   res_auth <- shinymanager::secure_server(
     check_credentials = check_credentials(credentials)
   )
+  
+  output$user_info <- renderText({
+    paste("Connecté en tant que :", res_auth$user)
+  })
   
   # --- Changement dynamique de thème ---
   observe({
