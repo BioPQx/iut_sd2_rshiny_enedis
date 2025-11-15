@@ -135,6 +135,7 @@ ui <- fluidPage(
     div(
       id = "sidebar_panel",
       class = "sidebar-panel",
+      h4(textOutput("user_info")),
       style = "width: clamp(150px, 30%, 450px);",
       div(class="section-title", "VARIABLES"),
       fluidRow(
