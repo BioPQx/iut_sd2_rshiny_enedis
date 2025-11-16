@@ -1,19 +1,19 @@
 # Packages Nécessaires
 Pour fonctionner, l'application nécessite les packages R suivants.
 
-'shiny' : Le framework de base pour l'application.
+`shiny` : Le framework de base pour l'application.
 
-plotly : Pour les graphiques interactifs.
+`plotly` : Pour les graphiques interactifs.
 
-dplyr : Utilisé pour la manipulation de données (filtrage dynamique).
+`dplyr` : Utilisé pour la manipulation de données (filtrage dynamique).
 
-rlang : Nécessaire pour l'évaluation dynamique des filtres dplyr (!!parse_expr()).
+`rlang` : Nécessaire pour l'évaluation dynamique des filtres dplyr (!!parse_expr()).
 
-bslib : Pour la gestion des thèmes Bootstrap 5 et le changement dynamique.
+`bslib` : Pour la gestion des thèmes Bootstrap 5 et le changement dynamique.
 
-ggplot2 : Pour la création des graphiques de base (avant conversion en plotly).
+`ggplot2` : Pour la création des graphiques de base (avant conversion en plotly).
 
-shinymanager : Pour gérer l'écran de connexion et l'authentification des utilisateurs.
+`shinymanager` : Pour gérer l'écran de connexion et l'authentification des utilisateurs.
 
 Commande d'installation
 Vous pouvez installer toutes les dépendances en une seule fois avec la commande suivante dans votre console R :
