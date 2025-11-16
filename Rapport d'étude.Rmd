@@ -1,0 +1,228 @@
+---
+title: "Analyse des Performances Énergétiques (DPE) en France"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    toc: true
+    number_sections: true
+lang: fr
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align = 'center')
+
+library(tidyverse)
+library(readr)
+library(knitr)
+library(scales)
+library(patchwork)
+
+```
+
+# Introduction
+
+Ce rapport vise à analyser les données des Diagnostics de Performance Énergétique (DPE) en France pour répondre à deux problématiques principales :
+
+- Les étiquettes DPE diffèrent-elles selon le niveau de richesse du département ?
+- Quels facteurs influencent les performances énergétiques ?
+
+
+```{r}
+url_data <- "https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/df_dpe.csv"
+df_dpe_raw <- read_csv(url_data)
+```
+
+
+```{r}
+df_dpe <- df_dpe_raw %>%
+mutate(
+etiquette_dpe = factor(etiquette_dpe, levels = c("A","B","C","D","E","F","G")),
+etiquette_ges = factor(etiquette_ges, levels = c("A","B","C","D","E","F","G")),
+periode_construction = cut(
+annee_construction,
+breaks = c(0,1948,1974,2000,2012,Inf),
+labels = c("Avant 1948","1949-1974","1975-2000","2001-2012","Après 2012"),
+right = FALSE
+),
+dpe_numeric = as.numeric(etiquette_dpe)
+) %>%
+filter(!is.na(etiquette_dpe))
+
+df_ain <- df_dpe %>% filter(code_departement_ban == "01")
+df_gard <- df_dpe %>% filter(code_departement_ban == "30")
+```
+
+# Analyse des logements
+
+## Distribution générale des DPE
+
+```{r}
+df_compare_prop_DPE <- df_dpe %>%
+  filter(code_departement_ban %in% c("01", "30")) %>%
+  mutate(
+    departement = case_when(
+      code_departement_ban == "01" ~ "Ain (01)",
+      code_departement_ban == "30" ~ "Gard (30)"
+    )
+  ) %>%
+  group_by(departement, etiquette_dpe) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(departement) %>%
+  mutate(proportion = n / sum(n))
+
+ggplot(df_compare_prop_DPE, aes(x = etiquette_dpe, y = proportion, fill = etiquette_dpe)) +
+  geom_col() +
+  facet_wrap(~ departement) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(values = c(
+    "A"="#008000","B"="#32CD32","C"="#FFFF00",
+    "D"="#FFA500","E"="#FF4500","F"="#FF0000","G"="#8B0000"
+  )) +
+  labs(
+    title = "Répartition proportionnelle des étiquettes DPE",
+    x = "Étiquette DPE",
+    y = "Proportion"
+  ) +
+  theme_minimal()
+
+```
+
+Ce diagramme à barres compare la distribution des étiquettes DPE entre l'Ain et le Gard :
+
+- Dans l'Ain, la distribution est centrée sur les étiquettes D (environ 32%) et E (environ 23%). Les étiquettes A et B sont très rares.
+
+
+- Dans le Gard, la performance semble globalement meilleure. L'étiquette C est la plus fréquente (près de 40%), suivie de l'étiquette D (environ 30%). On note également une proportion légèrement plus élevée d'étiquettes A et B par rapport à l'Ain.
+
+En résumé, le Gard présente une proportion plus élevée de logements classés C, tandis que l'Ain a une plus grande concentration de logements classés D et E.
+
+## Influence de la Surface Habitable
+
+```{r}
+df_compare_prop_DPE <- df_dpe %>%
+  filter(code_departement_ban %in% c("01", "30")) %>%
+  mutate(
+    departement = case_when(
+      code_departement_ban == "01" ~ "Ain (01)",
+      code_departement_ban == "30" ~ "Gard (30)"
+    )
+  )
+
+ggplot(df_compare_prop_DPE, aes(x = etiquette_dpe, y = surface_habitable_logement, fill = etiquette_dpe)) +
+  geom_boxplot(show.legend = FALSE) +
+  coord_cartesian(ylim = c(0, 250)) +
+  facet_wrap(~ departement) +   # <-- le + manquait ici !
+  scale_fill_manual(values = c(
+    "A"="#008000","B"="#32CD32","C"="#FFFF00",
+    "D"="#FFA500","E"="#FF4500","F"="#FF0000","G"="#8B0000"
+  )) +
+  labs(
+    title = "Surface habitable selon le DPE",
+    x = "Étiquette DPE",
+    y = "Surface (m²)"
+  ) +
+  theme_minimal()
+```
+
+Ce graphique (diagramme en boîte) analyse la relation entre la surface habitable (en m²) et l'étiquette DPE pour les deux départements :
+
+- On observe une tendance notable dans les deux départements : les logements ayant les meilleures étiquettes (A et B) ont tendance à avoir une surface habitable médiane plus grande.
+
+- Par exemple, dans le Gard, la surface médiane des logements A est la plus élevée (environ 130 m²), tandis que les médianes pour les étiquettes C à G se situent plus bas, souvent entre 70 et 90 m².
+
+- La tendance est similaire dans l'Ain, bien que les surfaces médianes pour A et B soient légèrement inférieures à celles du Gard.
+
+Cela suggère que les logements les plus performants (A/B) ne sont pas nécessairement les plus petits ; il s'agit souvent de constructions (probablement plus récentes) de taille confortable.
+
+## Influence de l'année de construction
+
+```{r}
+df_compare_construction <- df_dpe %>%
+  filter(code_departement_ban %in% c("01", "30")) %>%
+  filter(!is.na(periode_construction), !is.na(etiquette_dpe)) %>%
+  mutate(
+    departement = case_when(
+      code_departement_ban == "01" ~ "Ain (01)",
+      code_departement_ban == "30" ~ "Gard (30)"
+    )
+  ) %>%
+  group_by(departement, periode_construction, etiquette_dpe) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(departement, periode_construction) %>%
+  mutate(proportion = n / sum(n))
+
+ggplot(df_compare_construction, 
+       aes(x = periode_construction, y = proportion, fill = etiquette_dpe)) +
+  geom_col() +
+  facet_wrap(~ departement) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(values = c(
+    "A"="#008000","B"="#32CD32","C"="#FFFF00",
+    "D"="#FFA500","E"="#FF4500","F"="#FF0000","G"="#8B0000"
+  )) +
+  labs(
+    title = "Répartition proportionnelle des DPE selon l'année de construction",
+    x = "Période de construction",
+    y = "Proportion"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Ce diagramme montre très clairement l'impact majeur de l'année de construction sur la performance énergétique :
+
+- Bâtiments anciens ("Avant 1948" et "1949-1974") : Dans les deux départements, ces périodes sont massivement dominées par les étiquettes les moins performantes (E, F, G - en teintes orange et rouge).
+
+- Bâtiments récents ("Après 2012") : À l'inverse, les constructions les plus récentes sont très majoritairement classées A, B ou C (en teintes vertes et jaunes), reflétant l'impact des réglementations thermiques modernes.
+
+- Périodes intermédiaires ("1975-2000" et "2001-2012") : On observe une transition progressive, avec une diminution des étiquettes F et G et une augmentation des étiquettes D et C à mesure que l'on se rapproche de nos jours.
+
+L'année de construction est donc un facteur déterminant du DPE.
+
+## Influence du type de bâtiment
+
+```{r}
+df_compare_type <- df_dpe %>%
+  filter(code_departement_ban %in% c("01", "30")) %>%                  
+  filter(!is.na(type_batiment), !is.na(etiquette_dpe)) %>%      
+  mutate(
+    departement = case_when(
+      code_departement_ban == "01" ~ "Ain (01)",
+      code_departement_ban == "30" ~ "Gard (30)"
+    )
+  ) %>%
+  group_by(departement, type_batiment, etiquette_dpe) %>%
+  summarise(n = n(), .groups = "drop") %>%
+  group_by(departement, type_batiment) %>%
+  mutate(proportion = n / sum(n))     
+
+ggplot(df_compare_type,
+       aes(x = type_batiment, y = proportion, fill = etiquette_dpe)) +
+  geom_col() +
+  facet_wrap(~ departement) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(values = c(
+    "A"="#008000","B"="#32CD32","C"="#FFFF00",
+    "D"="#FFA500","E"="#FF4500","F"="#FF0000","G"="#8B0000"
+  )) +
+  labs(
+    title = "Répartition proportionnelle des DPE selon le type de bâtiment",
+    x = "Type de bâtiment",
+    y = "Proportion"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0, hjust = 0.5))
+
+```
+
+Ce dernier graphique compare les performances DPE selon le type de bâtiment : appartement, immeuble et maison : 
+
+- "Immeuble" : Dans les deux départements, cette catégorie affiche les performances les plus faibles. Dans l'Ain, la proportion d'étiquettes F et G y est particulièrement élevée. Cela peut s'expliquer si "immeuble" désigne le diagnostic du bâtiment entier (parties communes) plutôt qu'un logement unique.
+
+- "Appartement" et "Maison" : Ces deux catégories présentent des profils assez similaires et globalement meilleurs que "immeuble". Dans le Gard, les maisons ("maison") semblent avoir une légère surreprésentation des étiquettes B et C par rapport aux appartements.
+
+Le type de bien a donc une influence, la catégorie "immeuble" se distinguant par ses faibles performances énergétiques.
+
+
+
