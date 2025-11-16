@@ -1,4 +1,4 @@
-# Packages Nécessaires
+# **Packages Nécessaires**
 Pour fonctionner, l'application nécessite les packages R suivants.
 
 shiny : Le framework de base pour l'application.
@@ -24,7 +24,7 @@ install.packages(c(
   "shiny", "plotly", "dplyr", "rlang", 
   "bslib", "ggplot2", "shinymanager"
 ))
-2. Installation et Lancement
+# Installation et Lancement
 Suivez ces étapes pour lancer l'application sur votre poste local.
 
 Prérequis
