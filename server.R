@@ -7,12 +7,12 @@ library(ggplot2)
 library(shinymanager)
 
 credentials <- data.frame(
-  user = c("utilisateur1", "admin", "utilisateur2", "asardell"),
-  password = c("motdepasse1", "adminpass", "motdepasse2", "licorne"),
+  user = c("utilisateur1", "admin", "utilisateur2", "asardell","2"),
+  password = c("motdepasse1", "adminpass", "motdepasse2", "licorne","2"),
   stringsAsFactors = FALSE
 )
 
-# --- Charger le CSV globalement ---
+# --- Charger le CSV ---
 url <- "https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/df_dpe.csv"
 data <- read.csv(url)
 
@@ -39,8 +39,9 @@ themes <- list(
 )
 
 # --- Fonction serveur ---
-function(input, output, session) {
+server <- function(input, output, session) {
   
+  # ---------------------------- AUTH ----------------------------
   res_auth <- shinymanager::secure_server(
     check_credentials = check_credentials(credentials)
   )
@@ -49,64 +50,217 @@ function(input, output, session) {
     paste("Connecté en tant que :", res_auth$user)
   })
   
-  # --- Changement dynamique de thème ---
+  # ---------------------------- THEMES ---------------------------
   observe({
     req(input$theme_choice)
-    if (!is.null(themes[[input$theme_choice]])) {
-      try({
-        session$setCurrentTheme(themes[[input$theme_choice]])
-      }, silent = TRUE)
-    }
+    session$setCurrentTheme(themes[[input$theme_choice]])
   })
   
-  # --- Mettre à jour les selectInput pour les axes X et Y ---
-  updateSelectInput(session, "var_x", choices = names(data), selected = names(data)[1])
-  updateSelectInput(session, "var_y", choices = names(data), selected = names(data)[2])
+  # ----------------------- VARIABLES DISPONIBLES ----------------
+  observe({
+    updateSelectInput(session, "var_selected", choices = names(data))
+  })
   
-  # --- Détection automatique du type de graphique ---
-  get_plot_type <- function(df, x, y) {
-    if (is.numeric(df[[x]]) && is.numeric(df[[y]])) {
-      "scatter"
-    } else if ((is.factor(df[[x]]) || is.character(df[[x]])) && is.numeric(df[[y]])) {
-      "boxplot"
-    } else if ((is.factor(df[[y]]) || is.character(df[[y]])) && is.numeric(df[[x]])) {
-      "boxplot"
-    } else {
-      "bar"
-    }
+  # ------------------- FONCTION TYPE VARIABLE -------------------
+  get_type <- function(v) {
+    if (is.numeric(v)) return("numeric")
+    if (is.character(v) || is.factor(v)) return("categorical")
+    return("other")
   }
   
-  # --- Graphique interactif ---
+  # ---------------------------- GRAPHIQUE ------------------------
   output$graph_plot <- renderPlotly({
-    req(input$var_x, input$var_y, input$max_points)
+    req(input$var_selected)
     
-    # Limiter le nombre de points
-    plot_data <- head(data, input$max_points)
+    df <- data
     
-    # Appliquer le filtre SQL si renseigné
+    # Filtre optionnel
+    if (input$filter_condition != "") {
+      try({ df <- df %>% filter(!!parse_expr(input$filter_condition)) }, silent = TRUE)
+    }
+    
+    var <- input$var_selected
+    col <- df[[var]]
+    var_type <- get_type(col)
+    
+    label <- paste0(var, " (sur ", format(nrow(data), big.mark=" "), " DPE)")
+    
+    # Style général
+    base_theme <- theme_minimal(base_size = 14) +
+      theme(
+        plot.title = element_text(size=18, face="bold"),
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_line(color="#DDDDDD"),
+        axis.title = element_text(face="bold"),
+        axis.text = element_text(size=12)
+      )
+    
+    # -------- NUMERIQUE --------
+    if (var_type == "numeric") {
+      p <- ggplot(df, aes_string(x = var)) +
+        geom_histogram(bins = 50, fill="#4C72B0", color="white", alpha=0.85) +
+        geom_vline(aes(xintercept = mean(col, na.rm = TRUE)),
+                   linetype = "dashed", color="#C44741", linewidth=0.9) +
+        annotate("text", x = mean(col, na.rm = TRUE), y = Inf, vjust = -0.5,
+                 label = paste("Moyenne :", round(mean(col, na.rm=TRUE),2)),
+                 color="#C44741", fontface="bold", size=4) +
+        labs(title = label, x = var, y = "Nombre d'observations") +
+        base_theme
+      
+      # -------- CATEGORIEL --------
+    } else if (var_type == "categorical") {
+      top_vals <- df %>% count(!!sym(var)) %>% arrange(desc(n)) %>% slice_head(n = 20)
+      p <- ggplot(top_vals, aes_string(x = var, y = "n")) +
+        geom_col(fill="#4C72B0", alpha=0.85) +
+        coord_flip() +
+        labs(title = paste0(label, " — Top 20"), y = "Fréquence", x = var) +
+        base_theme
+      
+      # -------- AUTRE --------
+    } else {
+      p <- ggplot() + labs(title="Type non supporté") + base_theme
+    }
+    
+    ggplotly(p) %>%
+      layout(hoverlabel = list(bgcolor="white", font=list(size=13, color="black")),
+             plot_bgcolor="white", paper_bgcolor="white", margin=list(t=60, b=60))
+  })
+  
+  # ---------------------- STATISTIQUES DESCRIPTIVES ------------------------
+  output$stats_box <- renderUI({
+    req(input$var_selected)
+    
+    df <- data
+    if (input$filter_condition != "") {
+      try({ df <- df %>% filter(!!parse_expr(input$filter_condition)) }, silent=TRUE)
+    }
+    
+    var <- input$var_selected
+    col <- df[[var]]
+    
+    if (is.numeric(col)) {
+      stats <- list(
+        Min = min(col, na.rm=TRUE),
+        Q1 = quantile(col,0.25, na.rm=TRUE),
+        Médiane = median(col, na.rm=TRUE),
+        Moyenne = round(mean(col, na.rm=TRUE),2),
+        Q3 = quantile(col,0.75, na.rm=TRUE),
+        Max = max(col, na.rm=TRUE),
+        N = sum(!is.na(col))
+      )
+      
+      HTML(paste0(
+        "<h4><b>Statistiques descriptives : ", var, "</b></h4>",
+        "<ul>",
+        paste0("<li><b>", names(stats), " :</b> ", stats, collapse="</li>"),
+        "</li></ul>"
+      ))
+    } else {
+      tab <- df %>% count(!!sym(var)) %>% arrange(desc(n)) %>% head(10)
+      HTML(paste0(
+        "<h4><b>Top catégories : ", var, "</b></h4>",
+        paste(apply(tab,1,function(r) paste0(r[1], " : <b>", r[2], "</b> occurrences<br>")),
+              collapse = "")
+      ))
+    }
+  })
+  
+  # ---------------------- ANALYSE AUTOMATIQUE ------------------------
+  output$auto_box <- renderUI({
+    req(input$var_selected)
+    req(input$auto_analysis)
+    
+    df <- data
+    if (input$filter_condition != "") {
+      try({ df <- df %>% filter(!!parse_expr(input$filter_condition)) }, silent=TRUE)
+    }
+    
+    var <- input$var_selected
+    col <- df[[var]]
+    
+    if (is.numeric(col)) {
+      min_val <- min(col, na.rm=TRUE)
+      max_val <- max(col, na.rm=TRUE)
+      mean_val <- round(mean(col, na.rm=TRUE),2)
+      median_val <- median(col, na.rm=TRUE)
+      
+      HTML(paste0(
+        "<h4><b>Analyse automatique — ", var, "</b></h4>",
+        "<p>Variable <b>numérique</b> avec <b>", length(col), "</b> valeurs.</p>",
+        "<p>Moyenne : <b>", mean_val, "</b>, Médiane : <b>", median_val, "</b></p>",
+        "<p>Distribution : ",
+        if (abs(mean_val-median_val) < 0.1*mean_val) "symétrique" else "asymétrique",
+        "</p>",
+        "<p>Min : <b>", min_val, "</b>, Max : <b>", max_val, "</b></p>"
+      ))
+      
+    } else {
+      tab <- df %>% count(!!sym(var)) %>% arrange(desc(n))
+      HTML(paste0(
+        "<h4><b>Analyse automatique — ", var, "</b></h4>",
+        "<p>Variable <b>catégorielle</b> avec <b>", nrow(tab), "</b> catégories.</p>",
+        "<p>Catégorie dominante : <b>", tab[[var]][1], "</b> (", tab$n[1], " occurrences)</p>",
+        "<p>Suggestion : regrouper les catégories rares.</p>"
+      ))
+    }
+  })
+  
+
+  # ---------------------- CARTE INTERACTIVE ------------------------
+  output$map <- renderLeaflet({
+    req(data$coordonnee_cartographique_y_ban, data$coordonnee_cartographique_x_ban)
+    
+    leaflet(data) %>%
+      addProviderTiles(providers$CartoDB.Positron) %>%
+      addCircleMarkers(
+        lng = ~coordonnee_cartographique_x_ban,
+        lat = ~coordonnee_cartographique_y_ban,
+        radius = 3,
+        color = "#CA3E47",
+        stroke = FALSE,
+        fillOpacity = 0.6,
+        popup = ~paste0(
+          "<b>DPE :</b> ", DPE,
+          "<br><b>Surface :</b> ", surface_habitable_logement,
+          "<br><b>Département :</b> ", code_departement_ban
+        ),
+        clusterOptions = markerClusterOptions()
+      )
+  })
+  
+  # ---------------------- Sortie Brute ------------------------
+  
+  output$raw_table <- DT::renderDataTable({
+    df <- data
+    
+    # appliquer le filtre si renseigné
     if (input$filter_condition != "") {
       try({
-        plot_data <- plot_data %>% filter(!!parse_expr(input$filter_condition))
+        df <- df %>% filter(!!rlang::parse_expr(input$filter_condition))
       }, silent = TRUE)
     }
     
-    # Déterminer le type de graphique
-    plot_type <- get_plot_type(plot_data, input$var_x, input$var_y)
-    
-    # Créer le graphique ggplot
-    p <- switch(plot_type,
-                scatter = ggplot(plot_data, aes_string(x=input$var_x, y=input$var_y)) +
-                  geom_point(color="#5082B7", alpha=0.8) +
-                  theme_minimal(),
-                boxplot = ggplot(plot_data, aes_string(x=input$var_x, y=input$var_y)) +
-                  geom_boxplot(fill="#5082B7", alpha=0.5) +
-                  theme_minimal(),
-                bar = ggplot(plot_data, aes_string(x=input$var_x, fill=input$var_y)) +
-                  geom_bar(position="dodge") +
-                  theme_minimal()
+    DT::datatable(
+      df,
+      options = list(pageLength = 25, scrollX = TRUE),
+      rownames = FALSE
     )
-    
-    # Convertir en plotly interactif
-    ggplotly(p)
   })
+  
+  output$export_csv <- downloadHandler(
+    filename = function() {
+      paste0("sortie_brute_", Sys.Date(), ".csv")
+    },
+    content = function(file) {
+      df <- data
+      
+      # appliquer le filtre si renseigné
+      if (input$filter_condition != "") {
+        try({
+          df <- df %>% filter(!!rlang::parse_expr(input$filter_condition))
+        }, silent = TRUE)
+      }
+      write.csv(df, file, row.names = FALSE)
+    }
+  )
 }
