@@ -1,4 +1,6 @@
-# Packages Nécessaires
+# Documentation technique
+
+## Packages Nécessaires
 Pour fonctionner, l'application nécessite les packages R suivants.
 
 `shiny` : Le framework de base pour l'application.
@@ -25,7 +27,7 @@ install.packages(c(
 ))
 ```
 
-# Installation et Lancement
+## Installation et Lancement
 Suivez ces étapes pour lancer l'application sur votre poste local.
 
 **Prérequis**
