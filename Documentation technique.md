@@ -1,7 +1,7 @@
-# **Packages Nécessaires**
+# Packages Nécessaires
 Pour fonctionner, l'application nécessite les packages R suivants.
 
-shiny : Le framework de base pour l'application.
+'shiny' : Le framework de base pour l'application.
 
 plotly : Pour les graphiques interactifs.
 
