@@ -38,7 +38,7 @@ L'application segmente l'analyse en quatre vues distinctes, accessibles par des 
 
   **2. Onglet "Données" :**
 
--    **Intérêt (supposé) : ** Visualiser les données sous forme de différents graphiques avec possibilité de filtrer afin d'afinner ses analyses
+-    **Intérêt (supposé) :** Visualiser les données sous forme de différents graphiques avec possibilité de filtrer afin d'afinner ses analyses
 
   **3. Onglet "Sortie brute" :**
 
