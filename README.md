@@ -8,7 +8,7 @@ Fait :
 
 à Faire : 
 
-Réaliser le fichier Rmarkdown d'environ 4 pages : 
+Réaliser le fichier Rmarkdown d'environ 5 pages : 
 - KPI pertinents, statistiques bivariées et différents types de graphiques.
 - Automa 
 - Extraction région AURA
