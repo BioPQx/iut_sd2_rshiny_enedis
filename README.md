@@ -1,26 +1,61 @@
 # iut_sd2_rshiny_enedis
-Projet RShiny S3
+Projet RShiny S3 <br>
 Par Antoine MAURIN et Ewann MARRE
 
-Fait : 
+Ce document `README.md` est présent dans le repository du projet. Il permet de présenter les objectifs globaux, les livrables attendus et les spécifications de l'application à développer.
 
+## Objectifs globaux & Livrables
 
+Voici les principaux livrables attendus pour ce projet :
 
-à Faire : 
+* **Repository GitHub**
+    * Nommé `iut_sd2_shiny_enedis`.
+    * Contient tous les scripts utilisés (commentés).
+    * Inclut ce fichier `README.md` pour présenter les informations importantes.
+* **Rapport d'étude RMarkdown (4 pages max)**
+    * Mise en forme, rédaction et export au format HTML.
+    * Contient : KPI pertinents, statistiques bivariées et différents types de graphiques.
+    * Permet l'automatisation (choix du code postal, type de logement).
+* **Documentation Technique (2 pages max)**
+    * Rédigée en markdown.
+    * Inclut un schéma de l'architecture.
+    * Explique l'installation locale et présente les packages nécessaires.
+* **Documentation Fonctionnelle (2 pages max)**
+    * Rédigée en markdown.
+    * Présente l'intérêt de chaque page.
+    * Détaille les fonctionnalités majeures de l'application.
+* **Captation Vidéo (5 min max)**
+    * Explique comment installer l'application en local.
+    * Présente les fonctionnalités majeures de l'application.
 
-Réaliser le fichier Rmarkdown d'environ 5 pages : 
-- KPI pertinents, statistiques bivariées et différents types de graphiques.
-- Automa 
-- Extraction région AURA
-- Filtre :
-    - départements (ex : "69" ou "Rhône")
-    - ancienneté des batis (Pavé cliquables "ancien", "neuf")
-    - diagnostique de performance énergétique (Pavés cliquables A à G)
-    -  type de chaufffage ("électrique", "gaz naturel"...)
+## Spécifications de l'application (Cahier des charges)
 
+L'application doit respecter les fonctionnalités décrites dans les packs suivants, tels que définis dans le cahier des charges.
 
-https://www.google.com/url?sa=i&url=https%3A%2F%2Froelandtn.frama.io%2Fslides%2F2090628_meetup_Raddict_datageo.html&psig=AOvVaw0di3-aeyQLF-UIOItQKlRO&ust=1760444021150000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCMig9ZeToZADFQAAAAAdAAAAABAE
+### Pack "Standard"
+* Application déployée sur shinyapps.io (accessible via URL).
+* Dispose d'au moins 3 onglets/pages différents.
+* Utilise des images et des icônes.
+* Contient une cartographie interactive (avec markers).
+* Possède une page "Contexte" (présentation, visualisation des données).
+* Interaction via widgets (select, checkbox, sliders, radio buttons).
+* Filtre dynamique des données pour actualiser les tableaux et visualisations.
+* Proposition de plusieurs KPI.
+* Au moins 4 types de graphiques (histogramme, boite à moustache, diagramme, nuage de point).
 
-Voir page 26/58
+### Pack "Intermédiaire"
+* Permet à l'utilisateur de choisir un thème de son choix.
+* Boutons d'export pour les graphiques (.png) et les données (.csv).
+* Permet de sélectionner 2 variables (X et Y) pour calcul de corrélation et régression linéaire simple.
 
-<img width="808" height="479" alt="image" src="https://github.com/user-attachments/assets/665322a6-2f74-46f3-a0dd-2239cc1ae95f" />
+### Pack "Expert"
+* Dispose d'une charte visuelle personnalisée (via script CSS).
+* Permet de rafraîchir les données (via API et date de réception du DPE).
+* Demande de se connecter avec un utilisateur/mot de passe pour accéder à l'application.
+
+## Liens utiles
+
+* [Lien vers l'application shinyapps.io](https-votre-lien-ici.shinyapps.io/app-name) (à compléter)
+* [Lien vers la vidéo de présentation](lien-vers-la-video) (à compléter)
+* [Lien vers la documentation technique](lien-vers-doc-technique.md) (à compléter)
+* [Lien vers la documentation fonctionnelle](lien-vers-doc-fonctionnelle.md) (à compléter)
