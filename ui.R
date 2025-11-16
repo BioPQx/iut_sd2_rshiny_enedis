@@ -2,6 +2,9 @@ library(shiny)
 library(plotly)
 library(bslib)
 library(shinymanager)
+library(leaflet)
+library(sf)
+
 
 
 # --- Thème initial obligatoire pour Bootstrap 5 ---
@@ -138,18 +141,7 @@ ui <- fluidPage(
       h4(textOutput("user_info")),
       style = "width: clamp(150px, 30%, 450px);",
       div(class="section-title", "VARIABLES"),
-      fluidRow(
-        column(6, selectInput("var_x", "Axe X :", choices = NULL)),
-        column(6, selectInput("var_y", "Axe Y :", choices = NULL))
-      ),
-      numericInput(
-        inputId = "max_points",
-        label = "Nombre maximum de points à afficher",
-        value = 100,
-        min = 10,
-        max = 10000,
-        step = 100
-      ),
+      selectInput("var_selected", "Variable :", choices = NULL),
       div(
         style = "display: flex; align-items: center;",
         textInput(
@@ -159,7 +151,7 @@ ui <- fluidPage(
         ),
         tags$span(
           icon("info-circle"),
-          title = "Exemple : Sepal.Length > 5 & Species == 'setosa'",
+          title = "Exemple : type_batiment == 'maison'",
           style = "margin-left: 5px; cursor: pointer;"
         )
       )
@@ -172,21 +164,37 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel(
           "Carte",
-          div(
-            style="height:80%; background:var(--bs-body-bg); border-radius:8px; margin-bottom:12px; color:var(--bs-body-color); display:flex; align-items:center; justify-content:center;",
-            "Zone de visualisation de la carte ici..."
-          ),
-          div(class="circle-legend", "Légende graphique ici")
+          leafletOutput("map", height = "100%")
         ),
         tabPanel(
           "Données",
-          plotlyOutput("graph_plot", height="80%")
+          plotlyOutput("graph_plot", height="65%"),
+          hr(),
+          fluidRow(
+            column(
+              width = 6,
+              uiOutput("stats_box")
+            ),
+            column(
+              width = 6,
+              uiOutput("auto_box"),
+              actionButton("auto_analysis", "Analyse automatique", class = "btn btn-primary")
+            )
+          )
         ),
-        tabPanel("Maille", p("Affichage de la maille")),
-        tabPanel("Contour", p("Affichage des contours"))
+        tabPanel(
+          "Sortie brute",
+          fluidRow(
+            column(
+              width = 12,
+              downloadButton("export_csv", "Exporter CSV", class = "btn btn-success"),
+              br(), br(),
+              DT::dataTableOutput("raw_table")
+            )
+          )
+        )
       )
-    )
-  ),
+    ),
   
   # --- Script JS pour basculer la sidebar ---
   tags$script(HTML("
@@ -194,6 +202,6 @@ ui <- fluidPage(
       $('#sidebar_panel').toggleClass('sidebar-hidden');
     });
   "))
+),
 )
-
 ui <- shinymanager::secure_app(ui, language = "fr")
