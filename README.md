@@ -18,7 +18,7 @@ Voici les principaux livrables attendus pour ce projet :
    - SERVER
 ## Liens utiles
 
-* [Lien vers l'application shinyapps.io](https-votre-lien-ici.shinyapps.io/app-name)
+* [Lien vers l'application shinyapps.io]([https-votre-lien-ici.shinyapps.io/app-name](https://iutsd2mrnmrr.shinyapps.io/iutsd2mrnmrr))
 * [Lien vers la vidéo de présentation](lien-vers-la-video)
-* [Lien vers la documentation technique](lien-vers-doc-technique.md)
-* [Lien vers la documentation fonctionnelle](lien-vers-doc-fonctionnelle.md)
+* [Lien vers la documentation technique]([lien-vers-doc-technique.md](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20technique.md))
+* [Lien vers la documentation fonctionnelle]([lien-vers-doc-fonctionnelle.md](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20fonctionnelle.md))
