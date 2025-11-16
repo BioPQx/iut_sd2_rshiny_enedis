@@ -34,11 +34,11 @@ L'application segmente l'analyse en quatre vues distinctes, accessibles par des 
 
   **1. Onglet "Carte" :**
 
--    **Intérêt** : (Vue actuellement sélectionnée dans la capture d'écran) C'est la vue d'analyse statistique principale. Elle présente un résumé visuel (graphique en barres) et **quantitatif** ("Top catégories") de la variable sélectionnée. Elle inclut également le module d'"Analyse automatique" pour des insights rapides. Note : Bien que nommé "Carte", il affiche l'analyse statistique de base.
+-    Présente un résumé visuel (graphique en barres) et **quantitatif** ("Top catégories") de la variable sélectionnée. Elle inclut également le module d'"Analyse automatique" pour des insights rapides. Note : Bien que nommé "Carte", il affiche l'analyse statistique de base.
 
   **2. Onglet "Données" :**
 
--    **Intérêt (supposé) :** Visualiser les données sous forme de différents graphiques avec possibilité de filtrer afin d'afinner ses analyses
+-    Visualiser les données sous forme de différents graphiques avec possibilité de filtrer afin d'afinner ses analyses
 
   **3. Onglet "Sortie brute" :**
 
