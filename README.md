@@ -28,11 +28,12 @@ Voici les principaux livrables attendus pour ce projet :
    - *UI*
    - *SERVER*
 
-Login     
+
+`Login`
 ```
 asardell
 ```
-Mot de passe
+`Mot de passe`
 ```
 licorne
 ```
