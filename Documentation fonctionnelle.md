@@ -20,7 +20,7 @@ L'application offre plusieurs fonctionnalités puissantes pour l'exploration et 
 - **Gestion de Session** : L'application gère les sessions utilisateur (`"Connecté en tant que..."`).
 
 - **Personnalisation de l'Interface** : Un bouton permet de basculer entre les thèmes clair, sombre et
-  <span style = "color:red">
+  <span style = "color: red">
   licorne
   </span>.
 
