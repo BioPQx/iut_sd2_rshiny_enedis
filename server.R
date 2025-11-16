@@ -207,25 +207,11 @@ server <- function(input, output, session) {
   
 
   # ---------------------- CARTE INTERACTIVE ------------------------
+  
   output$map <- renderLeaflet({
-    req(data$coordonnee_cartographique_y_ban, data$coordonnee_cartographique_x_ban)
-    
-    leaflet(data) %>%
+    leaflet() %>%
       addProviderTiles(providers$CartoDB.Positron) %>%
-      addCircleMarkers(
-        lng = ~coordonnee_cartographique_x_ban,
-        lat = ~coordonnee_cartographique_y_ban,
-        radius = 3,
-        color = "#CA3E47",
-        stroke = FALSE,
-        fillOpacity = 0.6,
-        popup = ~paste0(
-          "<b>DPE :</b> ", DPE,
-          "<br><b>Surface :</b> ", surface_habitable_logement,
-          "<br><b>Département :</b> ", code_departement_ban
-        ),
-        clusterOptions = markerClusterOptions()
-      )
+      setView(lng = 2.35, lat = 48.85, zoom = 6)  # centre sur la France
   })
   
   # ---------------------- Sortie Brute ------------------------
