@@ -15,9 +15,9 @@ L'application offre plusieurs fonctionnalités puissantes pour l'exploration et 
 
 - **Analyse Automatisée** : Un module "Analyse automatique" identifie le type de variable (ex: "Variable catégorielle"), la catégorie dominante, et propose des suggestions contextuelles pour faciliter l'analyse.
 
-- **Navigation par Onglets** : L'interface principale est divisée en plusieurs vues (Carte, Données, Maille, Contour) pour différentes méthodes d'exploration.
+- **Navigation par Onglets** : L'interface principale est divisée en plusieurs vues (`Carte`, `Données`, `Sortie brute`) pour différentes méthodes d'exploration.
 
-- **Gestion de Session** : L'application gère les sessions utilisateur ("Connecté en tant que...").
+- **Gestion de Session** : L'application gère les sessions utilisateur (`"Connecté en tant que..."`).
 
 - **Personnalisation de l'Interface** : Un bouton "Sombre" permet de basculer entre les thèmes clair et sombre pour le confort visuel.
 
