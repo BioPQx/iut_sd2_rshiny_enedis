@@ -27,6 +27,14 @@ Voici les principaux livrables attendus pour ce projet :
 - [x]  **Application Shiny**
    - *UI*
    - *SERVER*
+     
+```Login
+asardell
+```
+```Mot de passe
+licorne
+```
+
 ## Liens utiles
 
 * [Lien vers l'application shinyapps.io](https://iutsd2mrnmrr.shinyapps.io/iutsd2mrnmrr)
