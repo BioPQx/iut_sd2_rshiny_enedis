@@ -19,10 +19,7 @@ L'application offre plusieurs fonctionnalités puissantes pour l'exploration et 
 
 - **Gestion de Session** : L'application gère les sessions utilisateur (`"Connecté en tant que..."`).
 
-- **Personnalisation de l'Interface** : Un bouton permet de basculer entre les thèmes clair, sombre et
-  <span style = "color: red">
-  licorne
-  </span>.
+- **Personnalisation de l'Interface** : Un bouton permet de basculer entre les thèmes clair, sombre et <span style="color:red;">Ce texte sera en rouge.</span>
 
 - **Actions** : Un bouton d'action flottant (`+`) est présent, afin de se deconnecter de l'application.
 
