@@ -20,5 +20,5 @@ Voici les principaux livrables attendus pour ce projet :
 
 * [Lien vers l'application shinyapps.io](https://iutsd2mrnmrr.shinyapps.io/iutsd2mrnmrr)
 * [Lien vers la vidéo de présentation](lien-vers-la-video)
-* [Lien vers la documentation technique]((https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20technique.md))
-* [Lien vers la documentation fonctionnelle]((https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20fonctionnelle.md))
+* [Lien vers la documentation technique](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20technique.md)
+* [Lien vers la documentation fonctionnelle](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20fonctionnelle.md)
