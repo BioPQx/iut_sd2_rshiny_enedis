@@ -8,12 +8,12 @@ Ce document `README.md` est présent dans le repository du projet. Il permet de 
 
 Voici les principaux livrables attendus pour ce projet :
 
-[x] **Repository GitHub**
-[x] **Rapport d'étude RMarkdown**
-[x] **Documentation Technique**
-[x] **Documentation Fonctionnelle**
-[x] **Captation Vidéo**
-[x] **Application Shiny
+- [x]  **Repository GitHub**
+- [x]  **Rapport d'étude RMarkdown**
+- [x]  **Documentation Technique**
+- [x]  **Documentation Fonctionnelle**
+- [x]  **Captation Vidéo**
+- [x]  **Application Shiny
    - UI
    - SERVER
 ## Liens utiles
