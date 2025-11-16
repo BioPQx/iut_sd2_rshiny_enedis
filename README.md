@@ -13,9 +13,9 @@ Voici les principaux livrables attendus pour ce projet :
 - [x]  **Documentation Technique**
 - [x]  **Documentation Fonctionnelle**
 - [x]  **Captation Vidéo**
-- [x]  **Application Shiny
-   - UI
-   - SERVER
+- [x]  **Application Shiny**
+   - *UI*
+   - *SERVER*
 ## Liens utiles
 
 * [Lien vers l'application shinyapps.io](https://iutsd2mrnmrr.shinyapps.io/iutsd2mrnmrr)
