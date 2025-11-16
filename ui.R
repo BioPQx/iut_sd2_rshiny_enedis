@@ -164,7 +164,7 @@ ui <- fluidPage(
       tabsetPanel(
         tabPanel(
           "Carte",
-          leafletOutput("map", height = "100%")
+          leafletOutput("map", height = "800px")
         ),
         tabPanel(
           "Données",
