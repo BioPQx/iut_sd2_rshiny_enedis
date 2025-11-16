@@ -58,10 +58,10 @@ Suivez ces étapes pour lancer l'application sur votre poste local.
 
 ### Se connecter :
 
-L'application vous présentera un écran de connexion.
+- L'application vous présentera un écran de connexion.
 
-Utilisez l'un des identifiants définis dans server.R pour vous connecter. Par exemple :
+- Utilisez l'un des identifiants définis dans server.R pour vous connecter. Par exemple :
 
-Utilisateur : `admin` / Mot de passe : `adminpass`
+  - Utilisateur : `admin` / Mot de passe : `adminpass`
 
-Utilisateur : `asardell` / Mot de passe : `licorne`
+  - Utilisateur : `asardell` / Mot de passe : `licorne`
