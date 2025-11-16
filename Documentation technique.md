@@ -42,7 +42,7 @@ Suivez ces étapes pour lancer l'application sur votre poste local.
 
 - *Alternative (si le projet est sur Git)* : Clonez le dépôt `git clone <url_du_projet>`.
 
-### Installer les packages :
+## Installer les packages :
 
 - Ouvrez RStudio.
 
