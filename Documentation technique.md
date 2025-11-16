@@ -19,11 +19,11 @@ Pour fonctionner, l'application nécessite les packages R suivants.
 Vous pouvez installer toutes les dépendances en une seule fois avec la commande suivante dans votre console R :
 
 ```R
-
 install.packages(c(
   "shiny", "plotly", "dplyr", "rlang",
   "bslib", "ggplot2", "shinymanager"
-))```
+))
+```
 
 # Installation et Lancement
 Suivez ces étapes pour lancer l'application sur votre poste local.
