@@ -34,7 +34,7 @@ L'application segmente l'analyse en quatre vues distinctes, accessibles par des 
 
   **1. Onglet "Carte" :**
 
--    Présente une cartographie pour avoir une visualisation rapide et compréhensible des données
+-    Présente une cartographie pour avoir une **visualisation rapide** et compréhensible des données
 
   **2. Onglet "Données" :**
 
