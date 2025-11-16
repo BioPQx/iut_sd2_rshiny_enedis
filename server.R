@@ -12,7 +12,6 @@ credentials <- data.frame(
   stringsAsFactors = FALSE
 )
 
-
 # --- Charger le CSV globalement ---
 url <- "https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/df_dpe.csv"
 data <- read.csv(url)
