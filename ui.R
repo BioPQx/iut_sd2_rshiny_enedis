@@ -219,7 +219,7 @@ ui <- fluidPage(
           fluidRow(
             column(
               width = 12,
-              downloadButton("export_csv", "Exporter CSV", class = "btn btn-success"),
+              downloadButton("export_csv", "Exporter CSV", class = "btn btn-primary"),
               br(), br(),
               DT::dataTableOutput("raw_table")
             )
