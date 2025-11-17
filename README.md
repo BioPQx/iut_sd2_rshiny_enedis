@@ -42,5 +42,5 @@ licorne
 
 * [Lien vers l'application shinyapps.io](https://iutsd2mrnmrr.shinyapps.io/iutsd2mrnmrr)
 * [Lien vers la vidéo de présentation](https://www.youtube.com/watch?v=xvFZjo5PgG0&list=RDxvFZjo5PgG0)
-* [Lien vers la documentation technique](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20technique.md)
-* [Lien vers la documentation fonctionnelle](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation%20fonctionnelle.md)
+* [Lien vers la documentation technique](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation/Documentation%20technique.md)
+* [Lien vers la documentation fonctionnelle](https://github.com/BioPQx/iut_sd2_rshiny_enedis/blob/main/Documentation/Documentation%20fonctionnelle.md)
