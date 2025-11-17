@@ -4,6 +4,7 @@ library(bslib)
 library(shinymanager)
 library(leaflet)
 library(sf)
+library(markdown)
 
 
 
@@ -114,7 +115,7 @@ ui <- fluidPage(
       tags$a(
         href="https://github.com/BioPQx/iut_sd2_rshiny_enedis",
         tags$img(
-          src="https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/img_github.png",
+          src="https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/Img/img_github.png",
           alt="github projet",
           width="45px",
           height="45px"
@@ -163,12 +164,43 @@ ui <- fluidPage(
       class = "main-content",
       tabsetPanel(
         tabPanel(
+          "Contexte",
+          fluidRow(
+            # --- COLONNE GAUCHE : TEXTE (Largeur 8/12) ---
+            column(
+              width = 8, 
+              h2("Diagnostic de Performance Énergétique pour l’Open Data University"),
+              p("Avec l’accélération du changement climatique et la hausse des prix de l’énergie, la sobriété énergétique est au cœur des préoccupations des Français. Aussi, afin d’éclairer et inspirer les acteurs de la transition écologique, Enedis propose des analyses et chiffres clés pour éclairer et orienter les décisions."),
+              p("En particulier, un des leviers de réduction des gaz à effets de serre (GES) et des consommations énergétiques est l’amélioration de la performance énergétique des bâtiments. Ainsi, l’un des objectifs de la Stratégie Bas Carbone (feuille de route de la France pour réduire ses émissions de GES et atteindre la neutralité carbone en 2050), est de diminuer d‘ici 2030 les émissions de gaz à effets de serre des bâtiments."),
+              p("Dans ce contexte, le Diagnostic de Performance Energétique (DPE) permet d’évaluer la performance énergétique et climatique d’un bâtiment. Il consiste en une étiquette pouvant aller de A à G pour chaque logement ou bâtiment, qui évalue sa consommation d’énergie et son impact en terme d’émission de GES. Il sert notamment à identifier les passoires énergétiques (étiquettes F et G du DPE, c’est-à-dire les logements qui consomment le plus d’énergie et/ou émettent le plus de gaz à effet de serre). Il a pour objectif d’informer l’acquéreur ou le locataire sur la « valeur verte », de recommander des travaux à réaliser pour l’améliorer et d’estimer ses charges énergétiques. De plus, la mise en location de ces passoires thermiques sera progressivement interdite (interdiction pour les bâtiments notés G+ au 1er janvier 2023, qui sera étendue par la suite)."),
+              p("Point à noter :"),
+              tags$ul(
+                tags$li("Les données proviennent des bases de l'ADEME"),
+                tags$li("Utilisez les onglets pour naviguer.")
+              )
+            ),
+            
+            # --- COLONNE DROITE : IMAGE (Largeur 4/12) ---
+            column(
+              width = 4,
+              div(
+                style = "margin-top: 20px; text-align: center;", # Style optionnel pour centrer et aérer
+                
+                # REMPLACEZ "mon_image.png" PAR LE NOM DE VOTRE FICHIER
+                # Le fichier doit être dans un dossier nommé 'www' à côté de votre script
+                img(src = "https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/Img/DPE-C.png", width = "100%", style = "border-radius: 10px;"),
+                img(src = "https://raw.githubusercontent.com/BioPQx/iut_sd2_rshiny_enedis/refs/heads/main/Img/picto-maison-png.webp", width = "100%", style = "border-radius: 10px;")
+              )
+            )
+          )
+        ),
+        tabPanel(
           "Carte",
           leafletOutput("map", height = "800px")
         ),
         tabPanel(
           "Données",
-          plotlyOutput("graph_plot", height="65%"),
+          plotlyOutput("graph_plot", height="65%", width="100%"),
           hr(),
           fluidRow(
             column(
@@ -195,13 +227,13 @@ ui <- fluidPage(
         )
       )
     ),
-  
-  # --- Script JS pour basculer la sidebar ---
-  tags$script(HTML("
+    
+    # --- Script JS pour basculer la sidebar ---
+    tags$script(HTML("
     $(document).on('click', '#menu_toggle', function() {
       $('#sidebar_panel').toggleClass('sidebar-hidden');
     });
   "))
-),
+  ),
 )
 ui <- shinymanager::secure_app(ui, language = "fr")
